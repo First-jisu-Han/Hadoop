@@ -1,0 +1,79 @@
+# HDFS 실습  - 여러 하드웨어 시스템을 묶어서 하나의 파일로 사용가능하게하는 하둡 분산처리 파일 시스템 
+
+- Docker desktop 실행 
+- sandbox-proxy 와 sandbox-hdp 을 run 시키기 
+
+- localhost:8080 에서 Ambari 접속 
+- Ambari 에서 id : maria_dev   password : maria_dev 로 접속해서 sandbox에 있는 서버들이 모두 정상화 될때까지(alerts 가 0이 되어야함 ) 기다림 
+
+
+
+매커니즘 
+
+호스트 컴퓨터(mac or window , hadoop 직접 명령어로 접근 불가능)   --    VM ( Hadoop명령어를 입력이 가능한 Virtual Machine )   --    HDFS (하둡 파일 시스템 ) 
+
+#window/ mac os 위에서 Linux( Ubuntu ) Virtual Machine 이 돌아가고 있는데 VM은 가상이기 때문에 실제 존재하지 않기때문에 os 내에서 2222 를  VM 22번 포트 와 연결되게끔 설정해놓았다.  
+따라서 2222 포트에 접속할 경우 VM 의 22번포트에 접속이 되는 것이다. 
+
+# Command Line Interface를 통해 실습 
+# mac 이라 터미널 사용 
+
+ssh root@localhost -p 2222    # 호스트 컴퓨터에서 2222포트로 root 아이디 접속, 비밀번호 hadoop에서 새비밀번호 설정하기 
+
+
+[root@sandbox-hdp ~]  ls -alF                  # root안의 디렉토리 모두 확인하는 명령어 하둡파일시스템에 접속한 것은 아니라, VM에 접속한 것 
+total 48
+dr-xr-x--- 1 root root 4096 Oct  2 17:55 ./
+drwxr-xr-x 1 root root 4096 Oct  2 15:19 ../
+-rw------- 1 root root   58 Oct  2 17:55 .bash_history
+-rw-r--r-- 1 root root   18 Dec 29  2013 .bash_logout
+-rw-r--r-- 1 root root  176 Dec 29  2013 .bash_profile
+-rw-r--r-- 1 root root  205 Jun 18  2018 .bashrc
+-rw-r--r-- 1 root root  100 Dec 29  2013 .cshrc
+drwxr----- 3 root root 4096 Jun 18  2018 .pki/
+-rw------- 1 root root 1024 Jun 18  2018 .rnd
+drwxr-xr-x 2 root root 4096 Jun 18  2018 .ssh/
+-rw-r--r-- 1 root root  129 Dec 29  2013 .tcshrc
+-rw------- 1 root root 3270 Apr  2  2018 anaconda-ks.cfg
+
+
+[root@sandbox-hdp ~] cd /home/                             # home에 들어가면 여러 디렉토리 존재 
+[root@sandbox-hdp home]# ls -alF
+drwxr-xr-x 1 root       root      4096 Jun 18  2018 ./
+drwxr-xr-x 1 root       root      4096 Oct  2 15:19 ../
+drwx------ 1 ambari-qa  hadoop    4096 Jun 18  2018 ambari-qa/
+drwx------ 1 amy_ds     amy_ds    4096 Jun 18  2018 amy_ds/
+drwx------ 2 atlas      hadoop    4096 Jun 18  2018 atlas/
+drwx------ 2 druid      hadoop    4096 Jun 18  2018 druid/
+drwx------ 2 falcon     hadoop    4096 Jun 18  2018 falcon/
+drwx------ 2 flume      hadoop    4096 Jun 18  2018 flume/
+drwx------ 2 hbase      hadoop    4096 Jun 18  2018 hbase/
+drwx------ 2 hcat       hadoop    4096 Jun 18  2018 hcat/
+drwx------ 2 hdfs       hadoop    4096 Jun 18  2018 hdfs/
+drwx------ 3 hive       hadoop    4096 Jun 18  2018 hive/
+drwx------ 2 infra-solr hadoop    4096 Jun 18  2018 infra-solr/
+drwx------ 2 kafka      hadoop    4096 Jun 18  2018 kafka/
+drwx------ 2 knox       hadoop    4096 Jun 18  2018 knox/
+drwx------ 2 livy       hadoop    4096 Jun 18  2018 livy/
+drwx------ 2 mapred     hadoop    4096 Jun 18  2018 mapred/
+drwx------ 1 maria_dev  maria_dev 4096 Oct  2 17:50 maria_dev/
+drwx------ 1 oozie      hadoop    4096 Oct  2 18:19 oozie/
+drwx------ 1 raj_ops    raj_ops   4096 Jun 18  2018 raj_ops/
+drwx------ 2 ranger     hadoop    4096 Jun 18  2018 ranger/
+drwx------ 2 spark      hadoop    4096 Jun 18  2018 spark/
+drwx------ 2 sqoop      hadoop    4096 Jun 18  2018 sqoop/
+drwx------ 2 storm      hadoop    4096 Jun 18  2018 storm/
+drwx------ 3 superset   hadoop    4096 Jun 18  2018 superset/
+drwx------ 2 tez        hadoop    4096 Jun 18  2018 tez/
+drwx------ 2 yarn       hadoop    4096 Jun 18  2018 yarn/
+drwx------ 2 zeppelin   hadoop    4096 Jun 18  2018 zeppelin/
+drwx------ 2 zookeeper  hadoop    4096 Jun 18  2018 zookeeper/
+
+[root@sandbox-hdp home]# cd maria_dev/             # maria_dev 파일로 이동 
+[root@sandbox-hdp maria_dev]# hadoop fs -ls        # HDFS 에 접근 
+
+
+
+
+
+
