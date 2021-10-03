@@ -3,7 +3,7 @@
 - Docker desktop 실행 
 - sandbox-proxy 와 sandbox-hdp 을 run 시키기 
 
-- localhost:8080 에서 Ambari 접속 
+- localhost1080을 통해 localhost:8080의 Ambari 접속 
 - Ambari 에서 id : maria_dev   password : maria_dev 로 접속해서 sandbox에 있는 서버들이 모두 정상화 될때까지(alerts 가 0이 되어야함 ) 기다림 
 
 
@@ -71,6 +71,87 @@ drwx------ 2 zookeeper  hadoop    4096 Jun 18  2018 zookeeper/
 
 [root@sandbox-hdp home]# cd maria_dev/             # maria_dev 파일로 이동 
 [root@sandbox-hdp maria_dev]# hadoop fs -ls        # HDFS 에 접근 
+[root@sandbox-hdp maria_dev]# hadoop --help        # hadoop 명령어 목록 보기 
+
+Usage: hadoop [--config confdir] [COMMAND | CLASSNAME]
+  CLASSNAME            run the class named CLASSNAME
+ or
+  where COMMAND is one of:
+  fs                   run a generic filesystem user client
+  version              print the version
+  jar <jar>            run a jar file
+                       note: please use "yarn jar" to launch
+                             YARN applications, not this command.
+  checknative [-a|-h]  check native hadoop and compression libraries availability
+  distcp <srcurl> <desturl> copy file or directories recursively
+  envvars              display computed Hadoop environment variables
+  archive -archiveName NAME -p <parent path> <src>* <dest> create a hadoop archive
+  classpath            prints the class path needed to get the
+  credential           interact with credential providers
+                       Hadoop jar and the required libraries
+  daemonlog            get/set the log level for each daemon
+  trace                view and modify Hadoop tracing settings
+
+Most commands print help when invoked w/o parameters.
+
+[root@sandbox-hdp maria_dev]# hadoop fs -mkdir ml-latest        # hadoop 의 user디렉토리 안의 root파일에 ml-latest 라는 파일을 만듦  
+[root@sandbox-hdp maria_dev]# hadoop fs -ls                     # hadoop 파일 시스템의 디렉토리들을 모두 보여주기 
+Found 1 items
+drwxr-xr-x   - root hdfs          0 2021-10-03 02:23 ml-latest
+
+
+
+
+# 아이디 maria_dev로 접속 
+
+(base) hanjisu@hanjisuui-MacBookPro ~ % ssh maria_dev@192.168.35.176 -p 2222;    # maria_dev 로 접속 
+maria_dev@192.168.35.176's password:                                             # 패스워드 입력 
+Last login: Sat Oct  2 17:50:12 2021 from 172.18.0.3
+
+# 접속완료 
+[maria_dev@sandbox-hdp ~]$ ls -alF
+
+total 28
+drwx------ 1 maria_dev maria_dev 4096 Oct  2 17:50 ./
+drwxr-xr-x 1 root      root      4096 Jun 18  2018 ../
+-rw------- 1 maria_dev maria_dev    5 Oct  2 17:50 .bash_history
+-rw-r--r-- 1 maria_dev maria_dev   18 Sep  6  2017 .bash_logout
+-rw-r--r-- 1 maria_dev maria_dev  193 Sep  6  2017 .bash_profile
+-rw-r--r-- 1 maria_dev maria_dev  619 Jun 18  2018 .bashrc
+
+
+[maria_dev@sandbox-hdp ~]$ hadoop fs -ls              # hadoop 시스템의 maria_dev 디렉토리에 생성해 놓은 파일을 확인 이전에 mk-100k 를 UI를 통해 생성해놨기때문에 mk-100k 가 보여야한다.
+
+Found 1 items
+drwxr-xr-x   - maria_dev hdfs          0 2021-10-02 17:12 ml-100k      
+
+
+####   sandbox에서 파일을 업로드할때 여러개를 같이 올리기 힘들기 때문에 Cyberduck ( https://cyberduck.io/ ) 을 통하여 
+VM 에 먼저 올리고, hadoop 에 복사해서 올린다 ( 다시언급- 매커니즘    호스트 컴퓨터 - VM - HDFS     )     
+
+
+(base) hanjisu@hanjisuui-MacBookPro ~ % ssh maria_dev@192.168.35.176 -p 2222;     # Cyberduck을 통해 VM에 파일을 올린 후 확인 
+maria_dev@192.168.35.176's password: 
+Last login: Sun Oct  3 02:34:58 2021 from 172.18.0.2     # maria_dev 로 로그인 
+[maria_dev@sandbox-hdp ~]$ cd ml-100k                    
+
+[maria_dev@sandbox-hdp ml-100k]$ hadoop fs -ls           # 하둡 파일 시스템 확인 - ml-100k 파일이 존재 
+
+Found 1 items
+drwxr-xr-x   - maria_dev hdfs          0 2021-10-02 17:12 ml-100k        
+
+
+[maria_dev@sandbox-hdp ml-100k]$ hadoop fs -copyFromLocal ./* ml-100k/     # 하둡 파일 시스템에 로컬로부터 VM에 옮긴 파일들을 copy해서 옮기는 명령문 
+
+copyFromLocal: `ml-100k/u.data': File exists
+copyFromLocal: `ml-100k/u1.base': File exists
+[maria_dev@sandbox-hdp ml-100k]$ 
+
+
+
+# Ambari를 통해 확인 - maria_dev 파일안에 ml- 100k - VM에 있던 모든 파일들이 하둡으로 옮겨진 것을 확인가능 
+
+----------HDFS 실습 : 파일 옮기기 ----------------------------
 
 
 
