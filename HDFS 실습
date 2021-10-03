@@ -129,7 +129,6 @@ drwxr-xr-x   - maria_dev hdfs          0 2021-10-02 17:12 ml-100k
 ####   sandbox에서 파일을 업로드할때 여러개를 같이 올리기 힘들기 때문에 Cyberduck ( https://cyberduck.io/ ) 을 통하여 
 VM 에 먼저 올리고, hadoop 에 복사해서 올린다 ( 다시언급- 매커니즘    호스트 컴퓨터 - VM - HDFS     )     
 
-<img width="583" alt="스크린샷 2021-10-03 오후 12 13 11" src="https://user-images.githubusercontent.com/66197538/135738773-c681f8be-4a66-4ec7-8ff7-561b4ae1712c.png">
 
 (base) hanjisu@hanjisuui-MacBookPro ~ % ssh maria_dev@192.168.35.176 -p 2222;     # Cyberduck을 통해 VM에 파일을 올린 후 확인 
 maria_dev@192.168.35.176's password: 
