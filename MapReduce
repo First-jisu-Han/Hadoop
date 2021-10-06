@@ -49,6 +49,10 @@ ex)
 # mrjob 설치하기 
 [root@sandbox-hdp ~]# pip install mrjob
 
+MapReduce 디렉토리를 만들고 필요한 파이썬 코드를 넣어본다. 
+
+실습은 다른 커밋으로 해볼것이다. 
+
 
 
 
