@@ -40,5 +40,21 @@ ex)
 
 
 
+#MapReduce실습 
+
+# root 로 접속해서 python 패키지 관리자 설치하기 
+
+[root@sandbox-hdp ~]# yum install python-pip 
+
+# mrjob 설치하기 
+[root@sandbox-hdp ~]# pip install mrjob
+
+
+
+
+
+
+
+
 
 
