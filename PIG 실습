@@ -29,14 +29,117 @@ DUMP 명령문은 결과를 보기 위한 것,STORE 명령문은 결과를 저�
 
 – Ambari에 접속: maria_dev / maria_dev
 – File View 선택하고 /users/maria_dev 아래에 drivers.csv와 truck_event_text_partition.csv 업로드
-Create your script: Pig view 선택 , Scripts 탭에서 “New Script” 선택: “Truck-Events”라고 이름을 설정하고 저장한다. 
+Create your script: Ambari에서 Pig view 선택 , Scripts 탭에서 “New Script” 선택: “Truck-Events”라고 이름을 설정하고 저장한다.
+
+# Truck-Events에 스크립트를 입력 
+
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(','); 
+DESCRIBE truck_events; 
+
+실행결과 : 
+
+Schema for truck_events unknown.
+스키마를 모른다는 것은 - 컬럼이 age인지 , color 인지 등등을 모르는 것을 의미한다. 
+
+
+따라서 스키마를 만들어준다. 
+ 
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(',')
+AS (driverId:int, truckId:int, eventTime:chararray, eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray, routeId:long,routeName:chararray,eventDate:chararray);
+DESCRIBE truck_events;
+
+실행결과: 
+
+truck_events: {driverId: int,truckId: int,eventTime: chararray,eventType: chararray,longitude: double,latitude: double,eventKey: chararray,correlationId: long,driverName: chararray,routeId: long,routeName: chararray,eventDate: chararray}
+
+# 트럭의 개수를 100개로 제한하는 LIMIT operation을 작성 
+
+
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(',') AS (driverId:int, truckId:int, eventTime:chararray,
+eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray, routeId:long,routeName:chararray,eventDate:chararray);
+DESCRIBE truck_events;
+truck_events_subset = LIMIT truck_events 100;          
+DESCRIBE truck_events_subset;
+
+
+실행결과 : 
+truck_events: {driverId: int,truckId: int,eventTime: chararray,eventType: chararray,longitude: double,latitude: double,eventKey: chararray,correlationId: long,driverName: chararray,routeId: long,routeName: chararray,eventDate: chararray}
+truck_events_subset: {driverId: int,truckId: int,eventTime: chararray,eventType: chararray,longitude: double,latitude: double,eventKey: chararray,correlationId: long,driverName: chararray,routeId: long,routeName: chararray,eventDate: chararray}
 
 
 
+View Data - DUMP를 통한 출력 
+
+
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(',')
+AS (driverId:int, truckId:int, eventTime:chararray, eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray, routeId:long,routeName:chararray,eventDate:chararray);
+DESCRIBE truck_events;
+truck_events_subset = LIMIT truck_events 100; DUMP truck_events_subset;
+
+
+실행결과 :
+
+DUMP는 빅데이터 상에서 너무 많은 값이 출력되기 때문에 나타내기 어려움 대략 이런 식으로 엄청나게 많은 데이터가 출력된다. 
+
+truck_events: {driverId: int,truckId: int,eventTime: chararray,eventType: chararray,longitude: double,latitude: double,eventKey: chararray,correlationId: long,driverName: chararray,routeId: long,routeName: chararray,eventDate: chararray}
+(,,eventTime,eventType,,,eventKey,,driverName,,routeName,eventDate)
+(14,25,59:21.4,Normal,-94.58,37.03,14|25|9223370572464814373,3660000000000000000,Adis Cesir,160405074,Joplin to Kansas City Route 2,2016-05-27-22)
+(18,16,59:21.7,Normal,-89.66,39.78,18|16|9223370572464814089,3660000000000000000,Grant Liu,1565885487,Springfield to KC Via Hanibal,2016-05-27-22)
+(27,105,59:21.7,Normal,-90.21,38.65,27|105|9223370572464814070,3660000000000000000,Mark Lochbihler,1325562373,Springfield to KC Via Columbia Route 2,2016-05-27-22)
+(11,74,59:21.7,Normal,-90.2,38.65,11|74|9223370572464814123,3660000000000000000,Jamie Engesser,1567254452,Saint Louis to Memphis Route2,2016-05-27-22)
+(22,87,59:21.7,Normal,-90.04,35.19,22|87|9223370572464814101,3660000000000000000,Nadeem Asghar,1198242881, Saint Louis to Chicago Route2,2016-05-27-22)
+(22,87,59:22.3,Normal,-90.37,35.21,22|87|9223370572464813486,3660000000000000000,Nadeem Asghar,1198242881, Saint Louis to Chicago Route2,2016-05-27-22)
+(23,68,59:22.4,Normal,-89.91,40.86,23|68|9223370572464813450,3660000000000000000,Adam Diaz,160405074,Joplin to Kansas City Route 2,2016-05-27-22)
 
 
 
+관계형태에서 특정 컬럼을 Select하는 것 
+  
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(',') AS (driverId:int, truckId:int, eventTime:chararray,
+eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray, routeId:long,routeName:chararray,eventDate:chararray);
+DESCRIBE truck_events;
+specific_columns = FOREACH truck_events_subset GENERATE driverId, eventTime, eventType;
+DESCRIBE specific_columns;
 
+
+HDFS 에 relationship data 를 Store 한다. 
+
+
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(',') AS (driverId:int, truckId:int, eventTime:chararray,
+eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray, routeId:long,routeName:chararray,eventDate:chararray);
+DESCRIBE truck_events;
+specific_columns = FOREACH truck_events_subset GENERATE driverId, eventTime, eventType; DESCRIBE specific_columns;
+STORE specific_columns INTO 'output/specific_columns' USING PigStorage(',');
+
+
+2개의 관계형 데이터를 JOIN 하는 법 
+
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(',') AS (driverId:int, truckId:int, eventTime:chararray,
+eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray, routeId:long,routeName:chararray,eventDate:chararray);
+drivers = LOAD '/user/maria_dev/drivers.csv' USING PigStorage(',’) AS (driverId:int, name:chararray, ssn:chararray,
+location:chararray, certified:chararray, wage_plan:chararray);
+join_data = JOIN truck_events BY (driverId), drivers BY (driverId);
+DESCRIBE join_data;
+
+
+
+“ORDER BY” 를 사용해서 정렬하기 ( drivers를 name에 대해서 오름차순 ) 
+  
+drivers = LOAD '/user/maria_dev/drivers.csv' USING PigStorage(',') AS (driverId:int, name:chararray, ssn:chararray,
+location:chararray, certified:chararray, wage_plan:chararray);
+ordered_data = ORDER drivers BY name asc;        
+DUMP ordered_data;
+
+
+FILTER 와 데이터를 GROUP화 한다 “GROUP BY” 를 사용해서 
+  
+truck_events = LOAD '/user/maria_dev/truck_event_text_partition.csv' USING PigStorage(',') AS (driverId:int, truckId:int, eventTime:chararray,
+eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray, routeId:long,routeName:chararray,eventDate:chararray);
+filtered_events = FILTER truck_events BY NOT (eventType MATCHES 'Normal'); grouped_events = GROUP filtered_events BY driverId;
+DESCRIBE grouped_events;
+DUMP grouped_events;
+
+( envent type이 normal이 아닌 데이터를 filtering할 것이고, driverid 로 gorup by 시킨다.  ) 
 
 
 
