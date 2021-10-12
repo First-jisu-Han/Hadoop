@@ -1,2 +1,2 @@
 # Hadoop
-hadoop 실습내용 
+hadoop 이론적내용 
